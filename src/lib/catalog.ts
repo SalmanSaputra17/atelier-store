@@ -101,6 +101,24 @@ export async function getCategories(): Promise<Category[]> {
   }));
 }
 
+export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
+  return (await getCategories()).find((category) => category.slug === slug);
+}
+
+// Newest first, like the New Arrivals page.
+export async function getProductsByCategory(categoryId: number): Promise<Product[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
+  const rows = await db.query.products.findMany({
+    ...listQuery,
+    where: and(eq(products.isActive, true), eq(products.categoryId, categoryId)),
+    orderBy: [desc(products.createdAt)],
+  });
+  return rows.map(toProduct);
+}
+
 export async function getNewArrivals(limit = 8): Promise<Product[]> {
   "use cache";
   cacheLife("minutes");
