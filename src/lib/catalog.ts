@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { connection } from "next/server";
 import { db } from "@/db";
@@ -115,6 +115,53 @@ export async function getProductsByCategory(categoryId: number): Promise<Product
     ...listQuery,
     where: and(eq(products.isActive, true), eq(products.categoryId, categoryId)),
     orderBy: [desc(products.createdAt)],
+  });
+  return rows.map(toProduct);
+}
+
+const SEARCH_MAX_LENGTH = 100;
+const SEARCH_LIMIT = 48;
+
+// Trims, collapses whitespace and caps length so equivalent queries share a cache entry.
+export function normalizeSearchQuery(query: string | string[] | undefined): string {
+  const value = Array.isArray(query) ? query[0] : query;
+  return (value ?? "").trim().replace(/\s+/g, " ").slice(0, SEARCH_MAX_LENGTH);
+}
+
+// Every word must match the name, colour, description or category name
+// (case-insensitive). Name matches rank first, then newest.
+export async function searchProducts(query: string): Promise<Product[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("products");
+
+  const terms = normalizeSearchQuery(query).split(" ").filter(Boolean);
+  if (terms.length === 0) return [];
+
+  // Escape LIKE wildcards so "%" or "_" in a query match literally.
+  const pattern = (term: string) => `%${term.replace(/[\\%_]/g, "\\$&")}%`;
+  const termMatches = terms.map((term) => {
+    const like = pattern(term);
+    // Built as a separate query: inside db.query, raw sql`` columns get the products
+    // alias, which would turn a hand-written subquery into "products"."id".
+    const categoryIds = db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(ilike(categories.name, like));
+    return or(
+      ilike(products.name, like),
+      ilike(products.color, like),
+      ilike(products.description, like),
+      inArray(products.categoryId, categoryIds),
+    );
+  });
+  const nameMatch = ilike(products.name, pattern(terms.join(" ")));
+
+  const rows = await db.query.products.findMany({
+    ...listQuery,
+    where: and(eq(products.isActive, true), ...termMatches),
+    orderBy: [desc(nameMatch), desc(products.createdAt)],
+    limit: SEARCH_LIMIT,
   });
   return rows.map(toProduct);
 }
