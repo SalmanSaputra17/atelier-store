@@ -19,7 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
             />
           )}
           {product.badge && (
-            <span className="absolute top-3 left-3 bg-canvas px-2 py-1 label-caps">
+            <span className="glass absolute top-3 left-3 border border-canvas/60 px-2 py-1 label-caps">
               {product.badge}
             </span>
           )}

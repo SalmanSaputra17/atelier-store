@@ -17,7 +17,7 @@ export function SiteHeader() {
         Complimentary express shipping and returns
       </div>
 
-      <header className="sticky top-0 z-40 border-b bg-canvas/95 backdrop-blur-sm">
+      <header className="glass sticky top-0 z-40 border-b">
         <div className="container-page grid h-header grid-cols-[1fr_auto_1fr] items-center">
           <div className="flex items-center gap-1">
             <MobileNav items={navigation} />
@@ -33,7 +33,7 @@ export function SiteHeader() {
           <Link
             href="/"
             // Negative margin cancels the trailing letter-spacing so the wordmark centres optically.
-            className="-mr-[0.32em] text-heading font-medium tracking-[0.32em] uppercase"
+            className="-mr-[0.28em] font-display text-[1.375rem] leading-none font-medium tracking-[0.28em] uppercase md:text-[1.625rem]"
           >
             Aterlier
           </Link>

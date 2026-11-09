@@ -1,15 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
+import { HeroCarousel } from "@/components/home/hero-carousel";
 import { NewsletterForm } from "@/components/home/newsletter-form";
+import {
+  ArrowUpRightIcon,
+  ConversationIcon,
+  DeliveryIcon,
+  GiftIcon,
+  ScissorsIcon,
+} from "@/components/icons";
 import { ProductCard } from "@/components/product/product-card";
 import { SectionHeading } from "@/components/section-heading";
 import { getCategories, getNewArrivals } from "@/lib/catalog";
-import { appointment, collections, editorial, hero, services } from "@/lib/content";
+import { appointment, collections, editorial, heroSlides, services, type Service } from "@/lib/content";
 
 export default function Home() {
   return (
     <main id="main" className="flex-1">
-      <Hero />
+      <HeroCarousel slides={heroSlides} />
       <NewArrivals />
       <Collections />
       <Categories />
@@ -18,35 +26,6 @@ export default function Home() {
       <Services />
       <Newsletter />
     </main>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="relative h-[85svh] min-h-[34rem] max-h-[60rem] overflow-hidden bg-surface">
-      <Image
-        src={hero.image.src}
-        alt={hero.image.alt}
-        fill
-        preload
-        sizes="100vw"
-        className="object-cover"
-      />
-      <div className="absolute inset-0 bg-linear-to-t from-ink/70 via-ink/10 to-transparent" />
-      <div className="tone-inverse absolute inset-x-0 bottom-0 container-page pb-12 md:pb-20">
-        <p className="label-caps">{hero.eyebrow}</p>
-        <h1 className="mt-4 text-display">{hero.title}</h1>
-        <p className="mt-5 max-w-md text-body-lg text-canvas/85">{hero.body}</p>
-        <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-5">
-          <Link href="/collections/new-in" className="btn btn-inverse">
-            Discover the collection
-          </Link>
-          <Link href="/collections/women" className="link label-caps">
-            Shop women
-          </Link>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -85,13 +64,16 @@ function Collections() {
             sizes="(min-width: 48rem) 50vw, 100vw"
             className="object-cover transition-transform duration-1000 ease-luxe group-hover:scale-[1.03]"
           />
-          <div className="absolute inset-0 bg-linear-to-t from-ink/60 via-transparent to-transparent" />
-          <div className="tone-inverse absolute inset-x-0 bottom-0 flex flex-col items-center px-gutter pb-10 text-center md:pb-14">
-            <p className="label-caps">{collection.eyebrow}</p>
-            <h2 className="mt-3 text-title">{collection.title}</h2>
-            <span className="mt-6 label-caps underline decoration-1 underline-offset-[0.25em]">
-              Shop now
-            </span>
+          <div className="absolute inset-x-0 bottom-0 p-gutter">
+            <div className="tone-inverse glass-inverse flex items-end justify-between gap-6 border border-canvas/20 p-5 md:p-7">
+              <div>
+                <p className="label-caps">{collection.eyebrow}</p>
+                <h2 className="mt-2 text-heading">{collection.title}</h2>
+              </div>
+              <span className="shrink-0 label-caps underline decoration-1 underline-offset-[0.25em]">
+                Shop now
+              </span>
+            </div>
           </div>
         </Link>
       ))}
@@ -117,8 +99,11 @@ async function Categories() {
                   sizes="(min-width: 64rem) 25vw, (min-width: 40rem) 40vw, 72vw"
                   className="transition-transform duration-700 ease-luxe group-hover:scale-[1.03]"
                 />
+                <span className="glass absolute inset-x-3 bottom-3 flex items-center justify-between border border-canvas/60 px-4 py-3 label-caps">
+                  {category.name}
+                  <span aria-hidden="true">&rarr;</span>
+                </span>
               </div>
-              <p className="mt-4 label-caps">{category.name}</p>
             </Link>
           </li>
         ))}
@@ -155,7 +140,7 @@ function Editorial() {
 
 function Appointment() {
   return (
-    <section className="relative flex h-[70svh] min-h-[28rem] max-h-[48rem] items-center justify-center overflow-hidden bg-ink">
+    <section className="relative flex h-[70svh] min-h-[30rem] max-h-[48rem] items-center overflow-hidden bg-ink">
       <Image
         src={appointment.image.src}
         alt={appointment.image.alt}
@@ -163,32 +148,64 @@ function Appointment() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-ink/50" />
-      <div className="tone-inverse relative container-prose text-center">
-        <p className="label-caps">{appointment.eyebrow}</p>
-        <h2 className="mt-4 text-title">{appointment.title}</h2>
-        <p className="mt-5 text-body-lg text-canvas/85">{appointment.body}</p>
-        <Link href="/appointments" className="btn btn-inverse mt-8">
-          Book now
-        </Link>
+      <div className="absolute inset-0 bg-ink/15" />
+      <div className="relative container-page flex md:justify-end">
+        <div className="tone-inverse glass-inverse w-full max-w-md border border-canvas/20 p-8 md:p-12">
+          <p className="label-caps">{appointment.eyebrow}</p>
+          <h2 className="mt-4 text-title">{appointment.title}</h2>
+          <p className="mt-5 text-body-lg text-canvas/85">{appointment.body}</p>
+          <Link href="/appointments" className="btn btn-inverse mt-8">
+            Book now
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
 
+const serviceIcons: Record<Service["icon"], typeof DeliveryIcon> = {
+  delivery: DeliveryIcon,
+  gift: GiftIcon,
+  conversation: ConversationIcon,
+  scissors: ScissorsIcon,
+};
+
 function Services() {
   return (
-    <section aria-labelledby="services-heading" className="container-page section">
-      <h2 id="services-heading" className="sr-only">
-        Our services
-      </h2>
-      <ul className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-        {services.map((service) => (
-          <li key={service.title} className="border-t border-ink pt-6">
-            <h3 className="label-caps">{service.title}</h3>
-            <p className="mt-3 text-body text-ink-muted">{service.body}</p>
-          </li>
-        ))}
+    <section className="container-page section">
+      <SectionHeading eyebrow="Client care" title="At your service" />
+      {/* Swipeable rail on small screens (as in Shop by category), a 4-up grid on large. */}
+      <ul className="-mx-gutter flex snap-x snap-mandatory scroll-px-gutter gap-2 overflow-x-auto px-gutter scrollbar-none sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+        {services.map((service, i) => {
+          const Icon = serviceIcons[service.icon];
+          return (
+            <li key={service.title} className="w-[78%] shrink-0 snap-start sm:w-auto">
+              <Link
+                href={service.link.href}
+                className="group relative flex h-full min-h-72 flex-col overflow-hidden border bg-surface p-6 transition-colors duration-500 ease-luxe hover:border-ink hover:bg-canvas md:p-8"
+              >
+                <div className="flex items-start justify-between">
+                  <span className="glass inline-flex size-12 items-center justify-center border border-line">
+                    <Icon width={22} height={22} />
+                  </span>
+                  <span className="label-caps tabular-nums text-ink-subtle" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+                <h3 className="mt-auto pt-10 text-heading">{service.title}</h3>
+                <p className="mt-3 text-body text-ink-muted">{service.body}</p>
+                <span className="mt-6 inline-flex items-center gap-2 label-caps">
+                  <span className="link-quiet group-hover:decoration-current">{service.link.label}</span>
+                  <ArrowUpRightIcon
+                    width={14}
+                    height={14}
+                    className="transition-transform duration-500 ease-luxe group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
@@ -197,12 +214,14 @@ function Services() {
 function Newsletter() {
   return (
     <section className="section bg-surface">
-      <div className="container-prose text-center">
-        <p className="label-caps text-ink-muted">Newsletter</p>
-        <h2 className="mt-3 text-title">First to know</h2>
-        <p className="mt-5 text-body-lg text-ink-muted">
-          New collections, private sales and stories from the atelier, sent once a month.
-        </p>
+      <div className="container-page grid gap-10 lg:grid-cols-2 lg:items-end lg:gap-20">
+        <div className="max-w-md">
+          <p className="label-caps text-ink-muted">Newsletter</p>
+          <h2 className="mt-3 text-title">First to know</h2>
+          <p className="mt-5 text-body-lg text-ink-muted">
+            New collections, private sales and stories from the atelier, sent once a month.
+          </p>
+        </div>
         <NewsletterForm />
       </div>
     </section>

@@ -24,15 +24,50 @@ export const navigation = [
   { label: "Gifts", href: "/collections/gifts" },
 ];
 
-export const hero = {
-  eyebrow: "Autumn–Winter 2026",
-  title: "The Quiet Season",
-  body: "Deep reds, soft tailoring and leather made to be lived in.",
-  image: {
-    src: unsplash("1483985988355-763728e1935b"),
-    alt: "Woman in a burgundy coat and sunglasses carrying shopping bags",
-  },
+export type HeroSlide = {
+  eyebrow: string;
+  title: string;
+  body: string;
+  cta: { label: string; href: string };
+  image: ImageAsset & { position?: string }; // CSS object-position for the wide crop
 };
+
+// Homepage carousel, in display order. Slides 2–3 reuse catalogue shots that
+// crop well to a wide frame (see the photo rules in CLAUDE.md).
+export const heroSlides: HeroSlide[] = [
+  {
+    eyebrow: "Autumn–Winter 2026",
+    title: "The Quiet Season",
+    body: "Deep reds, soft tailoring and leather made to be lived in.",
+    cta: { label: "Discover the collection", href: "/collections/new-in" },
+    image: {
+      src: unsplash("1483985988355-763728e1935b"),
+      alt: "Woman in a burgundy coat and sunglasses carrying shopping bags",
+    },
+  },
+  {
+    eyebrow: "The leather edit",
+    title: "Made to be worn in",
+    body: "Our biker jacket, re-cut in supple Italian lambskin with a softer shoulder.",
+    cta: { label: "Shop the biker jacket", href: "/products/leather-biker-jacket" },
+    image: {
+      src: unsplash("1727518154538-59e7dc479f8f"),
+      alt: "Close-up of a black lambskin biker jacket's studded lapel and asymmetric zip",
+      position: "50% 40%",
+    },
+  },
+  {
+    eyebrow: "Jewellery",
+    title: "Gold, quietly",
+    body: "Sculpted teardrops in 18k gold vermeil, textured by hand to catch the light.",
+    cta: { label: "Shop jewellery", href: "/collections/jewellery" },
+    image: {
+      src: unsplash("1705326454933-9685fc6888e1"),
+      alt: "Gold teardrop earring hanging from a white display stand",
+      position: "50% 45%",
+    },
+  },
+];
 
 export const collections: Collection[] = [
   {
@@ -75,21 +110,36 @@ export const appointment = {
   },
 };
 
-export const services = [
+export type Service = {
+  icon: "delivery" | "gift" | "conversation" | "scissors";
+  title: string;
+  body: string;
+  link: { label: string; href: string };
+};
+
+export const services: Service[] = [
   {
+    icon: "delivery",
     title: "Complimentary shipping",
-    body: "Free express delivery and returns on every order.",
+    body: "Free express delivery and returns on every order, in 2–4 business days.",
+    link: { label: "Delivery & returns", href: "/client-services/shipping" },
   },
   {
+    icon: "gift",
     title: "Gift wrapping",
     body: "Each order arrives in our signature box with a handwritten note.",
+    link: { label: "How we wrap", href: "/client-services" },
   },
   {
+    icon: "conversation",
     title: "Client advisors",
-    body: "Personal styling advice by phone, chat or appointment.",
+    body: "Personal styling advice by phone, chat or private appointment.",
+    link: { label: "Book an advisor", href: "/appointments" },
   },
   {
+    icon: "scissors",
     title: "Repairs & care",
     body: "Lifetime care for leather goods, from our own workshop.",
+    link: { label: "Our workshop", href: "/craftsmanship" },
   },
 ];

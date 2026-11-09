@@ -69,11 +69,25 @@
   --aspect-hero: 16 / 9;
 
   --ease-luxe: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Hero carousel: fills the active slide's progress bar; its end advances the slide. */
+  --animate-hero-progress: hero-progress 7s linear forwards;
+
+  @keyframes hero-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
 }
 
 @theme inline {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Display serif: wordmark and hero headlines only; body and UI stay in sans. */
+  --font-display: var(--font-bodoni-moda), "Bodoni 72", Didot, ui-serif, serif;
 }
 
 @layer base {
@@ -217,6 +231,47 @@
 @utility tone-inverse {
   --focus-ring: var(--color-canvas);
   color: var(--color-canvas);
+}
+
+/*
+ * Glass: frosted panels for text that sits on imagery (campaign tiles, category
+ * labels, badges) and the sticky header. Square like everything else; pair with a
+ * hairline edge (border-canvas/…) where the panel sits on imagery. Falls back to
+ * near-opaque fills where backdrop blur is unsupported or the user prefers
+ * reduced transparency.
+ */
+@utility glass {
+  background-color: color-mix(in srgb, var(--color-canvas) 68%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: color-mix(in srgb, var(--color-canvas) 94%, transparent);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: var(--color-canvas);
+    backdrop-filter: none;
+  }
+}
+
+/*
+ * Dark glass for light text over photography; pair with tone-inverse.
+ * 58% ink keeps white text at >= 4.5:1 even over a pure-white backdrop.
+ */
+@utility glass-inverse {
+  background-color: color-mix(in srgb, var(--color-ink) 58%, transparent);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: color-mix(in srgb, var(--color-ink) 78%, transparent);
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: color-mix(in srgb, var(--color-ink) 88%, transparent);
+    backdrop-filter: none;
+  }
 }
 
 /* Typography primitives */

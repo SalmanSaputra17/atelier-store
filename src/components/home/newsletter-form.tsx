@@ -8,7 +8,7 @@ export function NewsletterForm() {
 
   if (submitted) {
     return (
-      <p role="status" className="mt-8 text-body-lg">
+      <p role="status" className="text-body-lg lg:pb-3">
         Thank you — you&rsquo;re on the list.
       </p>
     );
@@ -16,7 +16,7 @@ export function NewsletterForm() {
 
   return (
     <form
-      className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-end"
+      className="flex flex-col gap-4 sm:flex-row sm:items-end"
       onSubmit={(event) => {
         event.preventDefault();
         setSubmitted(true);
